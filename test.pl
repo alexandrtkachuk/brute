@@ -64,11 +64,59 @@ sub getIdent
 	}
 }
 
+sub getIDforWP
+{
+	my ($code, $result) = $brute->ConnectTor('localhost', 9050, 'http://super-turbo-dubler.com');
+
+	if ($result =~ /<input type="hidden" id="auth_ticket" value="(\w+)"/ )
+	{
+		print "Identi:" , $1, "\n";
+	}
+	else
+	{
+		print "Not found, code page:", $code, "\n";
+	}
+
+}
+
+sub nextval
+{
+	my ($string) = @_;
+
+
+	my @arr=split(//,$string);
+	
+	my $last_char = pop @arr;
+	
+	my ($temp) = $last_char;
+	$last_char++;
+
+	if( $temp gt $last_char ) #$temp > $last_char
+	{
+	
+	}
+
+	push @arr, $last_char;
+	
+	my ($retstr) = ("");
+
+	for(@arr)
+	{
+		$retstr .= $_;
+	}
+	
+	return $retstr;
+}
+
 sub main
 {
-	getIp();
-	getIdent();
+	#getIp();
+	#getIdent();
+	my ($string) = "testa";
+	$string = nextval($string);
 
+	print $string, "\n";
+	
 }
 
 
