@@ -27,15 +27,16 @@ sub new
 
 	my $class = ref($proto) || $proto;
 
-	my $self = {};
+	my $self = { 'cookie' => '/tmp/first.cooks' };
 
 	bless($self,$class);
 
 	return $self;
 }
 
-sub FConnect
+sub ConnectTor
 {
+	my ($self, $host, $port, $url) = @_;
 	my ($curl) = WWW::Curl::Easy->new;
 	
 	my @authHeader = (
@@ -50,56 +51,30 @@ sub FConnect
 	);
 
 	$curl->setopt(CURLOPT_HEADER, 1);
-	#$curl->setopt(CURLOPT_USERAGENT, "Mozilla/5.0");
 	$curl->setopt(CURLOPT_HTTPHEADER, \@authHeader);
 	$curl->setopt(CURLOPT_AUTOREFERER, 1);
 	$curl->setopt(CURLOPT_FOLLOWLOCATION, 1);
 	$curl->setopt(CURLOPT_FAILONERROR, 0);	
 	$curl->setopt( CURLOPT_CONNECTTIMEOUT, 0);
-	#$curl->setopt(CURLOPT_TIMEOUT, 120);
-	################################
-	$curl->setopt(CURLOPT_URL, 'http://super-turbo-dubler.com');
-	my ($url) = 'super-turbo-dubler.com';
-	#$curl->setopt(CURLOPT_URL,
-	#	'https://translate.google.com/translate?sl=auto&tl=en&js=y&prev=_t&hl=en&ie=UTF-8&u=http%3A%2F%2F'
-	#		. $url
-	#		. '%2F&edit-text=&act=url');
-	#$curl->setopt(CURLOPT_URL, 'https://2ip.com.ua/ru');
-	$curl->setopt(CURLOPT_URL, 'https://2ip.ru/');
-	$curl->setopt(CURLOPT_COOKIEJAR, "/tmp/test2.cooks");
-	$curl->setopt(CURLOPT_COOKIEFILE, "/tmp/test2.cooks");
-	$curl->setopt(CURLOPT_PROXY, 'https://109.163.220.61:8080/');
+	$curl->setopt(CURLOPT_TIMEOUT, 120);
+	$curl->setopt(CURLOPT_URL, $url);
+
+
+	$curl->setopt(CURLOPT_COOKIEJAR, $self->{'cookie'});
+	$curl->setopt(CURLOPT_COOKIEFILE, $self->{'cookie'});
+	$curl->setopt(CURLOPT_PROXY, $host . ':' . $port);
 	
-
-	#$curl->setopt(CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-	$curl->setopt(CURLOPT_PROXYTYPE, CURLPROXY_HTTP );
-
+	$curl->setopt(CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+	
 	my ($response_body);
+	
 	$curl->setopt(CURLOPT_WRITEDATA, \$response_body);
 
 	my ($retcode) = $curl->perform;
 
 	if ($retcode == 0) 
 	{
-		#print("Transfer went ok\n");
-		my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
-
-		# judge result and next action based on $response_code
-
-		#print("Received response: $response_body\n");
-
-		#print $response_body;
-
-		#if ($response_body =~ /<input type="hidden" id="auth_ticket" value="(\w+)"/ )
-		if ($response_body =~ /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/ )
-		{
-			print "--" , $1, "-- \n";
-		}
-		else
-		{
-			print "code:", $response_code, "\n";
-		}
-
+		return ($curl->getinfo(CURLINFO_HTTP_CODE), $response_body); 
 	} 
 	else 
 	{
@@ -107,9 +82,5 @@ sub FConnect
 		print("An error happened: $retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
 	}
 }
-
-
-
-
 
 1;
