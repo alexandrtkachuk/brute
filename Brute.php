@@ -66,9 +66,6 @@ class Brute
 
 	#return false;
     }
-
-    
-
     
     public function tastParam($params)
     {     
@@ -142,5 +139,8 @@ class Brute
 
 	return $result;
     }
-    
+
+    ########################################################################################
+
+
    }
